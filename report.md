@@ -9,18 +9,22 @@ its frequency fluctuates across the 24-hour day.
 **fake_simple.json.gz** – 100 000 synthetic Turkish tweets
 
 # 3 .  Method  
-*   Token extraction by two regular expressions  
+*   Token extraction by two regular expressions (token-level match sayımı)  
 
     ```python
-    RE_YO  = r'\b\w+[ıiuü]yo\'?\b'          # yo / yo’
-    RE_YOR = r'\b\w+[ıiuü]yor\b'            # canonical yor
+    # Lookahead ile kelime sonu/bitiş kontrolü yapılır.
+    RE_YO  = r'\b\w*[ıiuü]yo\'?(?=\W|$)'      # yo / yo’
+    RE_YOR = r'\b\w*[ıiuü]yor(?=\W|$)'      # canonical yor
     ```
 
-*   A rough Turkish filter keeps only tweets that contain at least one
-    of the characters **ğ, ı, ş, ç, ö, ü**.  
-*   Hour-of-day is taken from the timestamp slice `created_at[11:13]`.
+*   Hız için varsayılan ön-eleme: metinde regex’in aradığı **ı/i/u/ü** karakterlerinden
+    en az biri bulunmalı (CLI ile kapatılabilir).
+*   Hour-of-day, `created_at` alanı `%Y-%m-%d %H:%M:%S` biçimiyle parse edilerek alınır.
 
-The main statistic is the hourly proportion  
+CSV çıktısı hem tweet-level (var/yok) hem token-level (eşleşme sayısı) sayımlarını içerir;
+grafik varsayılan olarak token-level oranı çizer.
+
+Main statistic (token-level) is the hourly proportion  
 
 \[
 \text{ratio}_{yo} \;=\;
